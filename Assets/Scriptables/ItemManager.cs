@@ -10,53 +10,22 @@ public class ItemManager : MonoBehaviour
     public int itemsCount;
     public int target;
     //public Image targetUIImage;
-    
+    public GameManager gameManager;
     // The GameObject to instantiate.
-    public GameObject entityToSpawn;
-
-    // An instance of the ScriptableObject defined above.
-    public ItemSpawnerScriptableObject issoValues;
-    private Sprite[] sprites;
-    // This will be appended to the name of the created entities and increment when each is created.
-    int instanceNumber = 1;
-    void SpawnEntities()
+    
+    public void StartGame()
     {
-        int currentSpawnPointIndex = 0;
-        sprites = Resources.LoadAll<Sprite>("art/ArcadeItems/compositefiles/16x16-black-outline.png");
-        for (int i = 0; i < issoValues.numberOfPrefabsToCreate; i++)
-        {
-            // Creates an instance of the prefab at the current spawn point.
-            GameObject currentEntity = Instantiate(entityToSpawn, issoValues.spawnPoints[currentSpawnPointIndex], Quaternion.identity);
-
-            // Sets the name of the instantiated entity to be the string defined in the ScriptableObject and then appends it with a unique number. 
-            currentEntity.name = issoValues.prefabName + instanceNumber;
-
-            
-            currentEntity.GetComponent<SpriteRenderer>().sprite = sprites[0];
-
-            // Moves to the next spawn point index. If it goes out of range, it wraps back to the start.
-
-            currentSpawnPointIndex = (currentSpawnPointIndex + 1) % issoValues.spawnPoints.Length;
-
-            instanceNumber++;
-        }
+        Reset(itemsCount);
     }
-    private void Update()
+    void Refill()
     {
-    }
-    private void Start()
-    {
-        //timer = 0.0f;
-        //SpawnEntities();
-        FillItemList();
-        target = Random.Range(0, items.Count);
-        SpawnItems(items.Count);
-
+        SpawnItems(15);
     }
     public void SetTarget(GameObject go)
     {
         print("Hello" + target);
         go.GetComponent<SpriteRenderer>().color = Color.red;
+        go.GetComponent<ItemController>().value = 5;
         //targetUIImage.sprite = items[target].GetComponent<SpriteRenderer>().sprite;
         //targetUIImage.color = go.GetComponent<SpriteRenderer>().color;
         /*
@@ -71,33 +40,59 @@ public class ItemManager : MonoBehaviour
         SpawnItems(n);
     }
 
-    void FillItemList()
+    void FillItemList(int num)
     {
-        for(int i = 0; i < itemsCount; i++)
+        for(int i = 0; i < num; i++)
         {
             // Could be a random number
             items.Add(uniqueItems[Random.Range(0,uniqueItems.Count)].obj);
         }
     }
-
-    public void RemoveItem(string name)
+    public void ClaimStonks()
     {
-        //Find item
-        for(int i = 0; i < items.Count; i++)
+        //Remove stonks from box
+
+        //Add/sub tokens
+        //Reset Play Timer
+        gameManager.NewRound(CalculateTokens());
+        RemoveStonks();
+
+    }
+    int CalculateTokens()
+    {
+        int sum = 0;
+        for (int i = 0; i < dropBox.itemsCollected.Count; i++)
         {
-            
-            string tempName = name.Substring(0, name.Length - 7);
-            print(tempName + " " + items[i].name);
-            
-            if (items[i].name == tempName)
-                if (items[i].name == name)
+            if (dropBox.itemsCollected[i].GetComponent<ItemController>().isClaimable)
             {
-                items.Remove(items[i]);
+                sum += dropBox.itemsCollected[i].GetComponent<ItemController>().value;
+            }
+        }
+        return sum;
+    }
+
+    public BoxCollection dropBox;
+    public void RemoveStonks()
+    {
+        for(int i = 0; i < dropBox.itemsCollected.Count; i++)
+        {
+            if (dropBox.itemsCollected[i].GetComponent<ItemController>().itemName == items[dropBox.itemsCollected[i].GetComponent<ItemController>().index].GetComponent<ItemController>().itemName)
+            {
+                GameObject go = dropBox.itemsCollected[i];
+                dropBox.itemsCollected.Remove(dropBox.itemsCollected[i]);
+                Destroy(go);
+                
             }
         }
         
     }
-
+    public void Reset(int num)
+    {
+        items.Clear();
+        FillItemList(num);
+        target = Random.Range(0, items.Count);
+        SpawnItems(items.Count);
+    }
     void SpawnItems(int itemNum)
     {
         for(int i = 0; i < itemNum; i++)

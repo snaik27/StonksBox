@@ -5,14 +5,15 @@ using UnityEngine;
 public class ItemController : MonoBehaviour
 {
     public int index;
+    public string itemName;
     public int value;
     public bool target;
-    public bool isClickable = false;
-    
+    public bool isClaimable = false;
+    public ItemManager itemManager;
     // Start is called before the first frame update
     void Start()
     {
-        
+        itemManager = FindObjectOfType<ItemManager>();
     }
 
     // Update is called once per frame
@@ -24,7 +25,7 @@ public class ItemController : MonoBehaviour
     {
         if(collision.gameObject.tag == "DropBox")
         {
-            isClickable = true;
+            isClaimable = true;
         }
     }
 }

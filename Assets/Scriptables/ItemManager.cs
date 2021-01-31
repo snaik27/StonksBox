@@ -103,7 +103,7 @@ public class ItemManager : MonoBehaviour
         for(int i = 0; i < itemNum; i++)
         {
             
-            GameObject go = Instantiate(items[i], transform.position + new Vector3(Random.Range(-1.0f,1.0f)/1.0f, Random.Range(-1.0f, 1.0f) / 1.0f,0), transform.rotation);
+            GameObject go = Instantiate(items[i], transform.position + new Vector3(Random.Range(-1.0f,1.0f)/.5f, Random.Range(-1.0f, 1.0f) / 1.0f,0), transform.rotation);
             go.GetComponent<ItemController>().index = i;
             go.GetComponent<ItemController>().value = 1;
             if (i == target)

@@ -9,13 +9,15 @@ using UnityEngine.InputSystem.Layouts;
 [AddComponentMenu("Input/On-Screen Stick Custom")]
 public class OnScreenStickCustom : OnScreenControl, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
+
+    public soundmanager soundManager;
     [Tooltip("+1 at top and right, -1 at bottom and left")]
     public Vector2 stickPosition;
     public void OnPointerDown(PointerEventData eventData)
     {
         if (eventData == null)
             throw new System.ArgumentNullException(nameof(eventData));
-
+        FindObjectOfType<soundmanager>().PlayButtonSound();
         RectTransformUtility.ScreenPointToLocalPointInRectangle(transform.parent.GetComponentInParent<RectTransform>(), eventData.position, eventData.pressEventCamera, out m_PointerDownPos);
     }
 
